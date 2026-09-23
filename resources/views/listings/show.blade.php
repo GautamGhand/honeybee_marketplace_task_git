@@ -3,14 +3,14 @@
 @section('title', $listing->title . ' - HoneyBee Market')
 
 @section('content')
-<div style="max-width: 1200px; margin: 0 auto; padding: 40px 16px;">
+<div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
 
     {{-- Breadcrumb Navigation --}}
     <nav class="flex text-xs text-gray-400 mb-6 gap-2 items-center flex-wrap">
         <a href="{{ route('listings.index') }}" class="hover:text-amber-400 transition-colors">Home</a>
         <span>/</span>
         @if($listing->category)
-            <a href="{{ route('listings.byCategory', $listing->category->slug) }}" class="hover:text-amber-400 transition-colors">
+            <a href="{{ route('listings.category', $listing->category->slug) }}" class="hover:text-amber-400 transition-colors">
                 {{ $listing->category->name }}
             </a>
             <span>/</span>
@@ -31,7 +31,7 @@
                 @endphp
 
                 {{-- Main Image Box --}}
-                <div class="relative w-full h-[380px] sm:h-[480px] bg-gray-950 rounded-2xl overflow-hidden flex items-center justify-center border border-gray-800">
+                <div class="relative flex h-64 w-full items-center justify-center overflow-hidden rounded-2xl border border-gray-800 bg-gray-950 sm:h-96 lg:h-[480px]">
                     @if($primaryImage)
                         <img id="mainDisplayImage" src="{{ asset('storage/' . $primaryImage->image_path) }}" alt="{{ $listing->title }}" class="w-full h-full object-contain">
                     @else
@@ -168,7 +168,7 @@
     @if(isset($similarListings) && $similarListings->count() > 0)
         <div class="mt-16">
             <h3 class="text-2xl font-extrabold text-white mb-6">Similar <span class="text-amber-400">Listings</span></h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 sm:gap-6">
                 @foreach($similarListings as $similar)
                     @php
                         $simImg = $similar->images->first();

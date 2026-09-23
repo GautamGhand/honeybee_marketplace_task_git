@@ -9,14 +9,14 @@
     <div class="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-gray-950 to-gray-950"></div>
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-3xl"></div>
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16 sm:pt-16 sm:pb-20">
         <div class="text-center max-w-3xl mx-auto">
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-5 sm:mb-6 leading-tight">
                 Buy & Sell
                 <span class="bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 bg-clip-text text-transparent">Anything</span>
                 <br>Near You
             </h1>
-            <p class="text-lg text-gray-400 mb-10 max-w-xl mx-auto">
+            <p class="text-base sm:text-lg text-gray-400 mb-8 sm:mb-10 max-w-xl mx-auto">
                 India's most trusted marketplace. Find the best deals on electronics, vehicles, property, and more in your city.
             </p>
 
@@ -38,7 +38,7 @@
 
 {{-- Categories Section --}}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex items-start gap-4 justify-between mb-8">
         <div>
             <h2 class="text-2xl font-bold text-gray-100">Browse Categories</h2>
             <p class="text-sm text-gray-500 mt-1">Find what you need in the right category</p>
@@ -48,10 +48,10 @@
         </a>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         @foreach($categories as $cat)
         <a href="{{ route('listings.category', $cat->slug) }}"
-           class="group relative bg-gray-900/50 border border-gray-800/50 rounded-2xl p-6 text-center hover:border-amber-500/30 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+           class="group relative bg-gray-900/50 border border-gray-800/50 rounded-2xl p-4 sm:p-6 text-center hover:border-amber-500/30 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
            id="category-{{ $cat->slug }}">
             {{-- Glow effect --}}
             <div class="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-amber-500/0 group-hover:from-amber-500/5 group-hover:to-amber-500/10 transition-all duration-500"></div>
@@ -99,7 +99,7 @@
 
 {{-- Fresh Listings Section --}}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex items-start gap-4 justify-between mb-8">
         <div>
             <h2 class="text-2xl font-bold text-gray-100">Fresh Listings</h2>
             <p class="text-sm text-gray-500 mt-1">Recently posted ads near you</p>
@@ -130,7 +130,7 @@
 
 {{-- CTA Section --}}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="relative overflow-hidden bg-gradient-to-r from-amber-500/10 to-amber-600/5 border border-amber-500/20 rounded-3xl p-10 md:p-16 text-center">
+    <div class="relative overflow-hidden bg-gradient-to-r from-amber-500/10 to-amber-600/5 border border-amber-500/20 rounded-3xl p-6 sm:p-10 md:p-16 text-center">
         <div class="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
         <div class="relative">
             <h2 class="text-3xl md:text-4xl font-bold mb-4">

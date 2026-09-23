@@ -21,7 +21,7 @@
 
     {{-- Flash Messages --}}
     @if(session('success'))
-    <div id="flash-success" class="fixed top-20 right-4 z-50 bg-amber-500/90 backdrop-blur-sm text-gray-900 px-6 py-3 rounded-xl shadow-2xl font-medium animate-slide-in-right">
+    <div id="flash-success" class="fixed top-20 right-4 left-4 z-50 rounded-xl bg-amber-500/90 px-4 py-3 font-medium text-gray-900 shadow-2xl backdrop-blur-sm animate-slide-in-right sm:left-auto sm:max-w-md sm:px-6">
         <div class="flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             {{ session('success') }}
@@ -30,7 +30,7 @@
     @endif
 
     @if($errors->any())
-    <div id="flash-error" class="fixed top-20 right-4 z-50 bg-red-500/90 backdrop-blur-sm text-white px-6 py-3 rounded-xl shadow-2xl font-medium animate-slide-in-right">
+    <div id="flash-error" class="fixed top-20 right-4 left-4 z-50 rounded-xl bg-red-500/90 px-4 py-3 font-medium text-white shadow-2xl backdrop-blur-sm animate-slide-in-right sm:left-auto sm:max-w-md sm:px-6">
         <ul class="list-disc list-inside">
             @foreach($errors->all() as $error)
                 <li>{{ $error }}</li>

@@ -205,8 +205,9 @@ class ListingController extends Controller
             ->with('success', 'Your ad has been posted successfully!');
     }
 
-    public function update(Request $request, Listing $listing)
+    public function update(Request $request,$id)
     {
+        $listing = Listing::where('id',$id)->firstOrFail();
         // Authorization check
         if ($listing->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
@@ -257,7 +258,7 @@ class ListingController extends Controller
             }
         }
 
-        return redirect()->route('listings.my-listings')
+        return redirect()->route('listings.mine')
             ->with('success', 'Listing updated successfully!');
     }
 
@@ -266,27 +267,37 @@ class ListingController extends Controller
      */
     public function byCategory(string $categorySlug)
     {
-        $category = Category::where('slug', $categorySlug)->firstOrFail();
+        $category = Category::where('slug', $categorySlug)
+            ->whereNull('parent_id')
+            ->with('children')
+            ->firstOrFail();
+
+        return view('categories.subcategories', compact('category'));
+    }
+
+    /**
+     * Show listings by a subcategory within its parent category.
+     */
+    public function bySubcategory(string $categorySlug, string $subcategorySlug)
+    {
+        $category = Category::where('slug', $categorySlug)
+            ->whereNull('parent_id')
+            ->firstOrFail();
+
+        $subcategory = $category->children()
+            ->where('slug', $subcategorySlug)
+            ->firstOrFail();
 
         $query = Listing::active()
             ->with(['category', 'subcategory', 'city', 'state', 'images', 'user']);
 
-        // If it's a parent category, include all subcategory listings too
-        if ($category->isParent()) {
-            $subcategoryIds = $category->children->pluck('id');
-            $query->where(function ($q) use ($category, $subcategoryIds) {
-                $q->where('category_id', $category->id)
-                  ->orWhereIn('subcategory_id', $subcategoryIds);
-            });
-        } else {
-            $query->where('subcategory_id', $category->id);
-        }
+        $query->where('subcategory_id', $subcategory->id);
 
         $listings = $query->latest()->paginate(12);
         $categories = Category::topLevel()->with('children')->get();
         $countries = Location::countries()->get();
 
-        return view('listings.index', compact('listings', 'categories', 'countries', 'category'));
+        return view('listings.index', compact('listings', 'categories', 'countries', 'category', 'subcategory'));
     }
 
     /**

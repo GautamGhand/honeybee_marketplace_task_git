@@ -28,19 +28,19 @@
             </form>
 
             {{-- Right Actions --}}
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3">
                 @auth
                     <a href="{{ route('listings.mine') }}" class="hidden sm:flex items-center gap-1.5 text-sm text-gray-400 hover:text-amber-400 transition-colors" id="my-listings-link">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
                         My Ads
                     </a>
                     <a href="{{ route('listings.create') }}"
-                       class="flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 font-semibold text-sm px-4 py-2 rounded-xl shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all active:scale-95"
+                       class="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 font-semibold text-sm px-4 py-2 rounded-xl shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all active:scale-95"
                        id="post-ad-btn">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                         Post Ad
                     </a>
-                    <div class="relative group" id="user-menu">
+                    <div class="relative hidden sm:block group" id="user-menu">
                         <button class="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-200 transition-colors px-2 py-1" id="user-menu-btn">
                             <div class="w-8 h-8 bg-gradient-to-br from-amber-400/20 to-amber-600/20 border border-amber-500/30 rounded-full flex items-center justify-center">
                                 <span class="text-amber-400 font-semibold text-xs">{{ substr(Auth::user()->name, 0, 1) }}</span>
@@ -60,10 +60,10 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="text-sm text-gray-400 hover:text-gray-200 transition-colors font-medium" id="login-link">Login</a>
-                    <a href="{{ route('register') }}" class="text-sm bg-gray-800 hover:bg-gray-700 border border-gray-700/50 text-gray-200 px-4 py-2 rounded-xl transition-all" id="register-link">Register</a>
+                    <a href="{{ route('login') }}" class="hidden sm:block text-sm text-gray-400 hover:text-gray-200 transition-colors font-medium" id="login-link">Login</a>
+                    <a href="{{ route('register') }}" class="hidden sm:block text-sm bg-gray-800 hover:bg-gray-700 border border-gray-700/50 text-gray-200 px-4 py-2 rounded-xl transition-all" id="register-link">Register</a>
                     <a href="{{ route('login') }}"
-                       class="flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 font-semibold text-sm px-4 py-2 rounded-xl shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all active:scale-95"
+                       class="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-900 font-semibold text-sm px-4 py-2 rounded-xl shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all active:scale-95"
                        id="post-ad-cta">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                         Post Ad
@@ -87,6 +87,14 @@
                 @auth
                     <a href="{{ route('listings.mine') }}" class="block px-3 py-2 text-sm text-gray-400 hover:text-amber-400 rounded-lg hover:bg-gray-800/50">My Listings</a>
                     <a href="{{ route('listings.create') }}" class="block px-3 py-2 text-sm text-amber-400 font-medium rounded-lg hover:bg-gray-800/50">+ Post Ad</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="block w-full px-3 py-2 text-left text-sm text-gray-400 hover:bg-gray-800/50 hover:text-red-400 rounded-lg">Logout</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="block px-3 py-2 text-sm text-gray-400 hover:text-amber-400 rounded-lg hover:bg-gray-800/50">Login</a>
+                    <a href="{{ route('register') }}" class="block px-3 py-2 text-sm text-gray-400 hover:text-amber-400 rounded-lg hover:bg-gray-800/50">Register</a>
+                    <a href="{{ route('login') }}" class="block px-3 py-2 text-sm font-medium text-amber-400 rounded-lg hover:bg-gray-800/50">+ Post Ad</a>
                 @endauth
             </div>
         </div>

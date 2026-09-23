@@ -3,7 +3,7 @@
 @section('title', 'Browse Listings - HoneyBee Market')
 
 @section('content')
-<div style="max-width: 1200px; margin: 0 auto; padding: 40px 16px;">
+<div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
 
     {{-- Header Section --}}
     <div class="mb-8">
@@ -18,7 +18,7 @@
 
         {{-- Sidebar Filters --}}
         <div class="lg:col-span-1">
-            <div class="bg-gray-900 border border-gray-800 rounded-3xl p-6 shadow-xl sticky top-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-3xl p-4 sm:p-6 shadow-xl lg:sticky lg:top-6">
                 <form method="GET" action="{{ route('listings.index') }}" class="space-y-6">
 
                     {{-- Search Input --}}

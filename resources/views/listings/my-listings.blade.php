@@ -3,10 +3,10 @@
 @section('title', 'My Listings - HoneyBee Market')
 
 @section('content')
-<div style="max-width: 1200px; margin: 0 auto; padding: 40px 16px;">
+<div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
     
     {{-- Header Section --}}
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div class="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-3xl font-extrabold text-white tracking-tight">
                 My <span class="text-amber-400">Listings</span>
@@ -14,7 +14,7 @@
             <p class="text-sm text-gray-400 mt-1">Manage all your posted advertisements</p>
         </div>
         <div>
-            <a href="{{ route('listings.create') }}" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/20 transition-all text-sm">
+            <a href="{{ route('listings.create') }}" class="inline-flex w-full justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/20 transition-all text-sm sm:w-auto">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Post New Ad
             </a>
@@ -30,10 +30,10 @@
 
     {{-- Listings Grid / Table --}}
     @if(isset($listings) && $listings->count() > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
             @foreach($listings as $listing)
                 <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between">
-                    <div>
+                    <a href="{{ route('listings.show', $listing->slug) }}" class="group block">
                         {{-- Image / Placeholder --}}
                         <div class="h-48 w-full bg-gray-800 relative overflow-hidden">
                            @if($listing->images && $listing->images->count() > 0)
@@ -52,7 +52,7 @@
                             <h3 class="text-lg font-bold text-gray-100 truncate mb-1">{{ $listing->title }}</h3>
                             <p class="text-xs text-gray-400 line-clamp-2 mb-4">{{ $listing->description }}</p>
                         </div>
-                    </div>
+                    </a>
 
                     {{-- Actions --}}
                     <div class="p-5 pt-0 flex items-center gap-2 border-t border-gray-800/60 mt-2">

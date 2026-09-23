@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');
 Route::get('/listing/{slug}', [ListingController::class, 'show'])->name('listings.show');
+Route::get('/category/{categorySlug}/{subcategorySlug}', [ListingController::class, 'bySubcategory'])->name('listings.subcategory');
 Route::get('/category/{categorySlug}', [ListingController::class, 'byCategory'])->name('listings.category');
 Route::get('/city/{citySlug}', [ListingController::class, 'byCity'])->name('listings.city');
 Route::get('/city/{citySlug}/{categorySlug}', [ListingController::class, 'byCityAndCategory'])->name('listings.city.category');
@@ -27,12 +28,11 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/post-ad', [ListingController::class, 'create'])->name('listings.create');
-    Route::get('/my-listings/show/{slug}', [ListingController::class, 'show'])->name('listings.show');
     Route::post('/post-ad', [ListingController::class, 'store'])->name('listings.store');
     Route::get('/my-listings', [ListingController::class, 'myListings'])->name('listings.mine');
     Route::get('/my-listings/edit/{id}', [ListingController::class, 'edit'])->name('listings.edit');
     Route::get('/my-listings/category/{slug}', [ListingController::class, 'edit'])->name('listings.byCategory');
-    Route::post('/my-listings/update/{id}', [ListingController::class, 'update'])->name('listings.update');
+    Route::put('/my-listings/update/{id}', [ListingController::class, 'update'])->name('listings.update');
 });
 
 // API routes for cascading dropdowns
