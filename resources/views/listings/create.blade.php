@@ -4,8 +4,6 @@
 
 @section('content')
 <div style="min-height: 70vh; display: flex; align-items: center; justify-content: center; padding: 40px 16px;">
-    
-    {{-- Main Container --}}
     <div style="width: 100%; max-width: 650px; margin: 0 auto;">
         
         {{-- Header --}}
@@ -18,11 +16,10 @@
 
         {{-- Form Box --}}
         <div class="bg-gray-900 border border-gray-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
-            
             <form method="POST" action="{{ route('listings.store') }}" enctype="multipart/form-data" class="space-y-5">
                 @csrf
 
-                {{-- Listing Type (Product vs Service) --}}
+                {{-- Listing Type --}}
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
                         Listing Type
@@ -62,7 +59,6 @@
 
                 {{-- Category & Price --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {{-- Category --}}
                     <div>
                         <label for="category_id" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
                             Category
@@ -81,7 +77,6 @@
                         @enderror
                     </div>
 
-                    {{-- Price --}}
                     <div>
                         <label for="price" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
                             Price (₹)
@@ -95,7 +90,7 @@
                     </div>
                 </div>
 
-                {{-- Location Section (Country -> State -> City -> Area) --}}
+                {{-- Location Section (Cascading Dropdowns) --}}
                 <div class="space-y-3 pt-1">
                     <label class="block text-xs font-semibold uppercase tracking-wider text-amber-400">
                         📍 Location Details
@@ -119,7 +114,7 @@
                             @enderror
                         </div>
 
-                        {{-- State (Parent: Country) --}}
+                        {{-- State --}}
                         <div>
                             <label for="state_id" class="block text-[11px] text-gray-400 mb-1">State</label>
                             <select id="state_id" name="state_id" required
@@ -136,7 +131,7 @@
                             @enderror
                         </div>
 
-                        {{-- City (Parent: State) --}}
+                        {{-- City --}}
                         <div>
                             <label for="city_id" class="block text-[11px] text-gray-400 mb-1">City</label>
                             <select id="city_id" name="city_id" required
@@ -153,7 +148,7 @@
                             @enderror
                         </div>
 
-                        {{-- Area (Parent: City) --}}
+                        {{-- Area --}}
                         <div>
                             <label for="area_id" class="block text-[11px] text-gray-400 mb-1">Area / Locality</label>
                             <select id="area_id" name="area_id"
@@ -185,35 +180,31 @@
                     @enderror
                 </div>
 
-                {{-- Image Upload --}}
+                {{-- Images --}}
                 <div>
                     <label for="images" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
                         Upload Photos
                     </label>
                     <input id="images" type="file" name="images[]" multiple accept="image/*"
                         class="w-full bg-gray-800/80 text-gray-300 text-sm rounded-xl px-4 py-2.5 border border-gray-700 focus:border-amber-500 focus:outline-none file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-gray-950 hover:file:bg-amber-400 file:cursor-pointer cursor-pointer">
-                    <p class="text-[11px] text-gray-500 mt-1">First selected image will be the cover thumbnail.</p>
+                    <p class="text-[11px] text-gray-500 mt-1">First selected image will be used as the cover thumbnail.</p>
                     @error('images.*')
                         <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
 
-                {{-- Submit Button --}}
+                {{-- Submit --}}
                 <div class="pt-2">
                     <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-amber-500/20 transition-all text-sm">
                         Publish Advertisement
                     </button>
                 </div>
             </form>
-
         </div>
-
     </div>
 </div>
 
-{{-- Dynamic Scripts --}}
 <script>
-    // Listing Type Button Switcher
     function selectListingType(type) {
         const btnProduct = document.getElementById('btn_type_product');
         const btnService = document.getElementById('btn_type_service');
@@ -238,7 +229,6 @@
         }
     }
 
-    // Dynamic 4-Level Cascading Dropdowns: Country -> State -> City -> Area
     document.addEventListener('DOMContentLoaded', function () {
         const selectedType = document.querySelector('input[name="type"]:checked')?.value || 'product';
         selectListingType(selectedType);
@@ -252,39 +242,33 @@
         const allCities = Array.from(citySelect.querySelectorAll('option[data-parent]'));
         const allAreas = Array.from(areaSelect.querySelectorAll('option[data-parent]'));
 
+        function filterOptions(selectElem, options, parentId, defaultText) {
+            const currentVal = selectElem.value;
+            selectElem.innerHTML = `<option value="" disabled selected>${defaultText}</option>`;
+            options.filter(opt => opt.dataset.parent === String(parentId))
+                   .forEach(opt => selectElem.appendChild(opt.cloneNode(true)));
+            if (currentVal) selectElem.value = currentVal;
+        }
+
         countrySelect.addEventListener('change', function () {
-            const selectedCountryId = this.value;
-
-            // Filter States based on Country parent_id
-            stateSelect.innerHTML = '<option value="" disabled selected>Select State</option>';
-            allStates.filter(opt => opt.dataset.parent === selectedCountryId)
-                     .forEach(opt => stateSelect.appendChild(opt.cloneNode(true)));
-
-            // Reset Cities & Areas
+            filterOptions(stateSelect, allStates, this.value, 'Select State');
             citySelect.innerHTML = '<option value="" disabled selected>Select City</option>';
             areaSelect.innerHTML = '<option value="">Select Area (Optional)</option>';
         });
 
         stateSelect.addEventListener('change', function () {
-            const selectedStateId = this.value;
-
-            // Filter Cities based on State parent_id
-            citySelect.innerHTML = '<option value="" disabled selected>Select City</option>';
-            allCities.filter(opt => opt.dataset.parent === selectedStateId)
-                     .forEach(opt => citySelect.appendChild(opt.cloneNode(true)));
-
-            // Reset Area
+            filterOptions(citySelect, allCities, this.value, 'Select City');
             areaSelect.innerHTML = '<option value="">Select Area (Optional)</option>';
         });
 
         citySelect.addEventListener('change', function () {
-            const selectedCityId = this.value;
-
-            // Filter Areas based on City parent_id
-            areaSelect.innerHTML = '<option value="">Select Area (Optional)</option>';
-            allAreas.filter(opt => opt.dataset.parent === selectedCityId)
-                    .forEach(opt => areaSelect.appendChild(opt.cloneNode(true)));
+            filterOptions(areaSelect, allAreas, this.value, 'Select Area (Optional)');
         });
+
+        // Trigger chain restore on validation error redirect
+        if (countrySelect.value) countrySelect.dispatchEvent(new Event('change'));
+        if (stateSelect.value) stateSelect.dispatchEvent(new Event('change'));
+        if (citySelect.value) citySelect.dispatchEvent(new Event('change'));
     });
 </script>
 @endsection
