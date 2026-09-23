@@ -36,12 +36,11 @@
                     <div>
                         {{-- Image / Placeholder --}}
                         <div class="h-48 w-full bg-gray-800 relative overflow-hidden">
-                            @if($listing->image_path ?? false)
-                                <img src="{{ asset('storage/' . $listing->image_path) }}" alt="{{ $listing->title }}" class="w-full h-full object-cover">
+                           @if($listing->images && $listing->images->count() > 0)
+                                <img src="{{ asset('storage/' . $listing->images->first()->image_path) }}" alt="{{ $listing->title }}" class="w-full h-full object-cover">
                             @else
-                                <div class="w-full h-full flex items-center justify-center text-gray-600">
-                                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                </div>
+                                {{-- Fallback default image --}}
+                                <img src="{{ asset('images/placeholder.png') }}" alt="{{ $listing->title }}" class="w-full h-full object-cover">
                             @endif
                             <span class="absolute top-3 right-3 bg-gray-950/80 backdrop-blur-md text-amber-400 font-bold px-3 py-1 rounded-lg text-xs border border-gray-800">
                                 ₹{{ number_format($listing->price ?? 0) }}
