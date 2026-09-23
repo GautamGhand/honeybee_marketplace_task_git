@@ -60,14 +60,6 @@
                         <a href="{{ route('listings.edit', $listing->id) }}" class="flex-1 text-center bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold py-2.5 rounded-xl border border-gray-700 transition-colors">
                             Edit
                         </a>
-                        
-                        <form action="{{ route('listings.destroy', $listing->id) }}" method="POST" class="flex-1" onsubmit="return confirm('Are you sure you want to delete this listing?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold py-2.5 rounded-xl border border-red-500/30 transition-colors">
-                                Delete
-                            </button>
-                        </form>
                     </div>
                 </div>
             @endforeach

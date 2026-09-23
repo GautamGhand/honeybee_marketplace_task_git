@@ -58,11 +58,11 @@ class ListingController extends Controller
         }
 
         // Search
-        if ($request->filled('q')) {
-            $search = $request->q;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+       if ($request->filled('q')) {
+            $searchTerm = strtolower($request->q);
+            $query->where(function($q) use ($searchTerm) {
+                $q->whereRaw('LOWER(title) LIKE ?', ["%{$searchTerm}%"])
+                ->orWhereRaw('LOWER(description) LIKE ?', ["%{$searchTerm}%"]);
             });
         }
 
@@ -112,9 +112,19 @@ class ListingController extends Controller
     public function create()
     {
         $categories = Category::topLevel()->with('children')->get();
-        $countries = Location::countries()->get();
+        $countries=Location::countries()->get();
+        $locations = Location::get();
 
-        return view('listings.create', compact('categories', 'countries'));
+        return view('listings.create', compact('categories', 'locations','countries'));
+    }
+
+    public function edit($id)
+    {
+        $categories = Category::topLevel()->with('children')->get();
+        $countries = Location::countries()->get();
+        $listing=Listing::where('id',$id)->first();
+
+        return view('listings.edit', compact('categories', 'countries', 'listing'));
     }
 
     /**
@@ -166,6 +176,62 @@ class ListingController extends Controller
 
         return redirect()->route('listings.show', $listing->slug)
             ->with('success', 'Your ad has been posted successfully!');
+    }
+
+    public function update(Request $request, Listing $listing)
+    {
+        // Authorization check
+        if ($listing->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'type' => ['sometimes', 'required', 'in:product,service'],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'min:20'],
+            'category_id' => ['required', 'exists:categories,id'],
+            'subcategory_id' => ['nullable', 'exists:categories,id'],
+            'country_id' => ['sometimes', 'nullable', 'exists:locations,id'],
+            'state_id' => ['sometimes', 'nullable', 'exists:locations,id'],
+            'city_id' => ['sometimes', 'nullable', 'exists:locations,id'],
+            'area_id' => ['sometimes', 'nullable', 'exists:locations,id'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'images.*' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+        ]);
+
+        // Update listing data
+        $listing->update([
+            'type' => $validated['type'] ?? $listing->type,
+            'title' => $validated['title'],
+            'slug' => Str::slug($validated['title']) . '-' . Str::random(5),
+            'description' => $validated['description'],
+            'category_id' => $validated['category_id'],
+            'subcategory_id' => $validated['subcategory_id'] ?? $listing->subcategory_id,
+            'country_id' => $validated['country_id'] ?? $listing->country_id,
+            'state_id' => $validated['state_id'] ?? $listing->state_id,
+            'city_id' => $validated['city_id'] ?? $listing->city_id,
+            'area_id' => $validated['area_id'] ?? $listing->area_id,
+            'price' => $validated['price'],
+        ]);
+
+        // Handle new images upload if provided
+        if ($request->hasFile('images')) {
+            $existingCount = $listing->images()->count();
+
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('listings/' . $listing->id, 'public');
+                
+                ListingImage::create([
+                    'listing_id' => $listing->id,
+                    'image_path' => $path,
+                    'is_primary' => ($existingCount === 0 && $index === 0),
+                    'sort_order' => $existingCount + $index,
+                ]);
+            }
+        }
+
+        return redirect()->route('listings.my-listings')
+            ->with('success', 'Listing updated successfully!');
     }
 
     /**
