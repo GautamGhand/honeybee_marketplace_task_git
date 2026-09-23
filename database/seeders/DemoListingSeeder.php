@@ -8,6 +8,7 @@ use App\Models\Location;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DemoListingSeeder extends Seeder
 {
@@ -284,7 +285,7 @@ class DemoListingSeeder extends Seeder
             Listing::create([
                 'user_id' => $users[$index % count($users)]->id,
                 'type' => $listingData['type'],
-                'slug' => strtolower($listingData['title']),
+                'slug' => Str::slug($listingData['title']),
                 'title' => $listingData['title'],
                 'description' => $listingData['description'],
                 'category_id' => $category->id,

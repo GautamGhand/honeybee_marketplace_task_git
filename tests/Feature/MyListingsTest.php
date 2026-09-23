@@ -41,15 +41,17 @@ class MyListingsTest extends TestCase
         $listing = Listing::create([
             'user_id' => $user->id,
             'type' => 'product',
-            'title' => 'Used Phone',
-            'slug' => 'used-phone',
-            'description' => 'A fully working used phone in excellent condition.',
+            'title' => 'MacBook Air M2 - 8GB/256GB Space Gray',
+            'slug' => 'macbook-air-m2-8gb256gb-space-gray',
+            'description' => 'A fully working MacBook Air in excellent condition.',
             'category_id' => $category->id,
             'country_id' => $country->id,
             'state_id' => $state->id,
             'city_id' => $city->id,
             'price' => 12000,
         ]);
+
+        $this->assertSame('macbook-air-m2-8gb256gb-space-gray', $listing->slug);
 
         $this->actingAs($user)
             ->get(route('listings.mine'))
