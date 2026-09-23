@@ -111,20 +111,47 @@ class ListingController extends Controller
      */
     public function create()
     {
-        $categories = Category::topLevel()->with('children')->get();
-        $countries=Location::countries()->get();
-        $locations = Location::get();
+        // Parent categories with subcategories
+        $categories = Category::whereNull('parent_id')->get();
+        $subcategories = Category::whereNotNull('parent_id')->get();
 
-        return view('listings.create', compact('categories', 'locations','countries'));
+        // Locations hierarchy
+        $countries = Location::whereNull('parent_id')->get();
+        $states = Location::whereIn('parent_id', $countries->pluck('id'))->get();
+        $cities = Location::whereIn('parent_id', $states->pluck('id'))->get();
+        $areas = Location::whereIn('parent_id', $cities->pluck('id'))->get();
+
+        return view('listings.create', compact(
+            'categories', 
+            'subcategories', 
+            'countries', 
+            'states', 
+            'cities', 
+            'areas'
+        ));
     }
 
     public function edit($id)
     {
-        $categories = Category::topLevel()->with('children')->get();
-        $countries = Location::countries()->get();
-        $listing=Listing::where('id',$id)->first();
+        $listing = Listing::findOrFail($id);
 
-        return view('listings.edit', compact('categories', 'countries', 'listing'));
+        $categories = Category::whereNull('parent_id')->get();
+        $subcategories = Category::whereNotNull('parent_id')->get();
+
+        $countries = Location::whereNull('parent_id')->get();
+        $states = Location::whereIn('parent_id', $countries->pluck('id'))->get();
+        $cities = Location::whereIn('parent_id', $states->pluck('id'))->get();
+        $areas = Location::whereIn('parent_id', $cities->pluck('id'))->get();
+
+        return view('listings.edit', compact(
+            'listing', 
+            'categories', 
+            'subcategories', 
+            'countries', 
+            'states', 
+            'cities', 
+            'areas'
+        ));
     }
 
     /**

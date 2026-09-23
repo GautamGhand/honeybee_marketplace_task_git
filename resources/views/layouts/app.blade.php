@@ -47,7 +47,7 @@
     {{-- Footer --}}
     @include('components.footer')
 
-    @yield('scripts')
+    @stack('scripts')
 
     <script>
         // Auto-hide flash messages
