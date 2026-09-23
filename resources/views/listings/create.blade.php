@@ -57,7 +57,7 @@
                     @enderror
                 </div>
 
-                {{-- Category & Price --}}
+                {{-- Category & Subcategory --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="category_id" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
@@ -66,7 +66,7 @@
                         <select id="category_id" name="category_id" required
                             class="w-full bg-gray-800/80 text-gray-100 text-sm rounded-xl px-4 py-3 border border-gray-700 focus:border-amber-500 focus:outline-none @error('category_id') border-red-500 @enderror">
                             <option value="" disabled selected>Select Category</option>
-                            @foreach($categories as $category)
+                            @foreach($categories->whereNull('parent_id') as$category)
                                 <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
@@ -78,16 +78,35 @@
                     </div>
 
                     <div>
-                        <label for="price" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
-                            Price (₹)
+                        <label for="subcategory_id" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
+                            Subcategory
                         </label>
-                        <input id="price" type="number" step="0.01" name="price" value="{{ old('price') }}" required
-                            placeholder="e.g. 5000"
-                            class="w-full bg-gray-800/80 text-gray-100 text-sm rounded-xl px-4 py-3 border border-gray-700 focus:border-amber-500 focus:outline-none placeholder-gray-500 @error('price') border-red-500 @enderror">
-                        @error('price')
+                        <select id="subcategory_id" name="subcategory_id"
+                            class="w-full bg-gray-800/80 text-gray-100 text-sm rounded-xl px-4 py-3 border border-gray-700 focus:border-amber-500 focus:outline-none @error('subcategory_id') border-red-500 @enderror">
+                            <option value="" disabled selected>Select Subcategory</option>
+                            @foreach($categories->whereNotNull('parent_id') as$subCategory)
+                                <option value="{{ $subCategory->id }}" data-parent="{{ $subCategory->parent_id }}" {{ old('subcategory_id') == $subCategory->id ? 'selected' : '' }}>
+                                    {{ $subCategory->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('subcategory_id')
                             <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                         @enderror
                     </div>
+                </div>
+
+                {{-- Price --}}
+                <div>
+                    <label for="price" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
+                        Price (₹)
+                    </label>
+                    <input id="price" type="number" step="0.01" name="price" value="{{ old('price') }}" required
+                        placeholder="e.g. 5000"
+                        class="w-full bg-gray-800/80 text-gray-100 text-sm rounded-xl px-4 py-3 border border-gray-700 focus:border-amber-500 focus:outline-none placeholder-gray-500 @error('price') border-red-500 @enderror">
+                    @error('price')
+                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 {{-- Location Section (Cascading Dropdowns) --}}
@@ -103,7 +122,7 @@
                             <select id="country_id" name="country_id" required
                                 class="w-full bg-gray-800/80 text-gray-100 text-sm rounded-xl px-3 py-2.5 border border-gray-700 focus:border-amber-500 focus:outline-none">
                                 <option value="" disabled selected>Select Country</option>
-                                @foreach($locations->where('type', 'country') as $country)
+                                @foreach($locations->where('type', 'country') as$country)
                                     <option value="{{ $country->id }}" {{ old('country_id') == $country->id ? 'selected' : '' }}>
                                         {{ $country->name }}
                                     </option>
@@ -120,7 +139,7 @@
                             <select id="state_id" name="state_id" required
                                 class="w-full bg-gray-800/80 text-gray-100 text-sm rounded-xl px-3 py-2.5 border border-gray-700 focus:border-amber-500 focus:outline-none">
                                 <option value="" disabled selected>Select State</option>
-                                @foreach($locations->where('type', 'state') as $state)
+                                @foreach($locations->where('type', 'state') as$state)
                                     <option value="{{ $state->id }}" data-parent="{{ $state->parent_id }}" {{ old('state_id') == $state->id ? 'selected' : '' }}>
                                         {{ $state->name }}
                                     </option>
@@ -137,7 +156,7 @@
                             <select id="city_id" name="city_id" required
                                 class="w-full bg-gray-800/80 text-gray-100 text-sm rounded-xl px-3 py-2.5 border border-gray-700 focus:border-amber-500 focus:outline-none">
                                 <option value="" disabled selected>Select City</option>
-                                @foreach($locations->where('type', 'city') as $city)
+                                @foreach($locations->where('type', 'city') as$city)
                                     <option value="{{ $city->id }}" data-parent="{{ $city->parent_id }}" {{ old('city_id') == $city->id ? 'selected' : '' }}>
                                         {{ $city->name }}
                                     </option>
@@ -154,7 +173,7 @@
                             <select id="area_id" name="area_id"
                                 class="w-full bg-gray-800/80 text-gray-100 text-sm rounded-xl px-3 py-2.5 border border-gray-700 focus:border-amber-500 focus:outline-none">
                                 <option value="">Select Area (Optional)</option>
-                                @foreach($locations->where('type', 'area') as $area)
+                                @foreach($locations->where('type', 'area') as$area)
                                     <option value="{{ $area->id }}" data-parent="{{ $area->parent_id }}" {{ old('area_id') == $area->id ? 'selected' : '' }}>
                                         {{ $area->name }}
                                     </option>
@@ -233,6 +252,12 @@
         const selectedType = document.querySelector('input[name="type"]:checked')?.value || 'product';
         selectListingType(selectedType);
 
+        // Category & Subcategory Elements
+        const categorySelect = document.getElementById('category_id');
+        const subcategorySelect = document.getElementById('subcategory_id');
+        const allSubcategories = Array.from(subcategorySelect.querySelectorAll('option[data-parent]'));
+
+        // Location Elements
         const countrySelect = document.getElementById('country_id');
         const stateSelect = document.getElementById('state_id');
         const citySelect = document.getElementById('city_id');
@@ -250,6 +275,12 @@
             if (currentVal) selectElem.value = currentVal;
         }
 
+        // Subcategory Filter Trigger
+        categorySelect.addEventListener('change', function () {
+            filterOptions(subcategorySelect, allSubcategories, this.value, 'Select Subcategory');
+        });
+
+        // Location Cascading Triggers
         countrySelect.addEventListener('change', function () {
             filterOptions(stateSelect, allStates, this.value, 'Select State');
             citySelect.innerHTML = '<option value="" disabled selected>Select City</option>';
@@ -265,7 +296,8 @@
             filterOptions(areaSelect, allAreas, this.value, 'Select Area (Optional)');
         });
 
-        // Trigger chain restore on validation error redirect
+        // Restore values on form validation failure
+        if (categorySelect.value) categorySelect.dispatchEvent(new Event('change'));
         if (countrySelect.value) countrySelect.dispatchEvent(new Event('change'));
         if (stateSelect.value) stateSelect.dispatchEvent(new Event('change'));
         if (citySelect.value) citySelect.dispatchEvent(new Event('change'));

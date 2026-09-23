@@ -58,7 +58,7 @@
                     @enderror
                 </div>
 
-                {{-- Category & Price --}}
+                {{-- Category & Subcategory --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="category_id" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
@@ -67,7 +67,7 @@
                         <select id="category_id" name="category_id" required
                             class="w-full bg-gray-800/80 text-gray-100 text-sm rounded-xl px-4 py-3 border border-gray-700 focus:border-amber-500 focus:outline-none @error('category_id') border-red-500 @enderror">
                             <option value="" disabled>Select Category</option>
-                            @foreach($categories as$category)
+                            @foreach($categories->whereNull('parent_id') as$category)
                                 <option value="{{ $category->id }}" {{ old('category_id', $listing->category_id) ==$category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
@@ -79,16 +79,35 @@
                     </div>
 
                     <div>
-                        <label for="price" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
-                            Price (₹)
+                        <label for="subcategory_id" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
+                            Subcategory
                         </label>
-                        <input id="price" type="number" step="0.01" name="price" value="{{ old('price', $listing->price) }}" required
-                            placeholder="e.g. 45000"
-                            class="w-full bg-gray-800/80 text-gray-100 text-sm rounded-xl px-4 py-3 border border-gray-700 focus:border-amber-500 focus:outline-none placeholder-gray-500 @error('price') border-red-500 @enderror">
-                        @error('price')
+                        <select id="subcategory_id" name="subcategory_id"
+                            class="w-full bg-gray-800/80 text-gray-100 text-sm rounded-xl px-4 py-3 border border-gray-700 focus:border-amber-500 focus:outline-none @error('subcategory_id') border-red-500 @enderror">
+                            <option value="" disabled selected>Select Subcategory</option>
+                            @foreach($categories->whereNotNull('parent_id') as$subCategory)
+                                <option value="{{ $subCategory->id }}" data-parent="{{ $subCategory->parent_id }}" {{ old('subcategory_id', $listing->subcategory_id ?? '') == $subCategory->id ? 'selected' : '' }}>
+                                    {{ $subCategory->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('subcategory_id')
                             <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
                         @enderror
                     </div>
+                </div>
+
+                {{-- Price --}}
+                <div>
+                    <label for="price" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
+                        Price (₹)
+                    </label>
+                    <input id="price" type="number" step="0.01" name="price" value="{{ old('price', $listing->price) }}" required
+                        placeholder="e.g. 45000"
+                        class="w-full bg-gray-800/80 text-gray-100 text-sm rounded-xl px-4 py-3 border border-gray-700 focus:border-amber-500 focus:outline-none placeholder-gray-500 @error('price') border-red-500 @enderror">
+                    @error('price')
+                        <p class="mt-1 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 {{-- Location Section (Cascading Dropdowns) --}}
@@ -253,6 +272,12 @@
         const selectedType = document.querySelector('input[name="type"]:checked')?.value || 'product';
         selectListingType(selectedType);
 
+        // Category & Subcategory Elements
+        const categorySelect = document.getElementById('category_id');
+        const subcategorySelect = document.getElementById('subcategory_id');
+        const allSubcategories = Array.from(subcategorySelect.querySelectorAll('option[data-parent]'));
+
+        // Location Elements
         const countrySelect = document.getElementById('country_id');
         const stateSelect = document.getElementById('state_id');
         const citySelect = document.getElementById('city_id');
@@ -261,6 +286,9 @@
         const allStates = Array.from(stateSelect.querySelectorAll('option[data-parent]'));
         const allCities = Array.from(citySelect.querySelectorAll('option[data-parent]'));
         const allAreas = Array.from(areaSelect.querySelectorAll('option[data-parent]'));
+
+        const targetCategoryId = "{{ old('category_id', $listing->category_id) }}";
+        const targetSubcategoryId = "{{ old('subcategory_id', $listing->subcategory_id ?? '') }}";
 
         const targetStateId = "{{ old('state_id', $listing->state_id) }}";
         const targetCityId = "{{ old('city_id', $listing->city_id) }}";
@@ -273,7 +301,12 @@
             if (targetValue) selectElem.value = targetValue;
         }
 
-        // Initialize state, city, and area on initial edit page load
+        // Initialize category & subcategory preselection for Edit
+        if (targetCategoryId) {
+            filterOptions(subcategorySelect, allSubcategories, targetCategoryId, 'Select Subcategory', targetSubcategoryId);
+        }
+
+        // Initialize location preselection for Edit
         if (countrySelect.value) {
             filterOptions(stateSelect, allStates, countrySelect.value, 'Select State', targetStateId);
         }
@@ -284,6 +317,12 @@
             filterOptions(areaSelect, allAreas, targetCityId, 'Select Area (Optional)', targetAreaId);
         }
 
+        // On Category change
+        categorySelect.addEventListener('change', function () {
+            filterOptions(subcategorySelect, allSubcategories, this.value, 'Select Subcategory');
+        });
+
+        // On Location changes
         countrySelect.addEventListener('change', function () {
             filterOptions(stateSelect, allStates, this.value, 'Select State');
             citySelect.innerHTML = '<option value="" disabled selected>Select City</option>';
